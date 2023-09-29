@@ -1,0 +1,25 @@
+Dear ChatGPT-4,
+
+I'm developing a program in OPENRNDR and I have encountered an issue. The program is designed to animate multiple circles on screen, with properties like width and color being influenced by image data. However, I am observing a flashing/stuttering issue with the animation of circle widths.
+
+The circles are represented by a `Cell` class, and each instance stores its own brightness, color, and width values. Specifically, `prevW` is the width of the circle in the last scene, `goalW` is the target width for the current scene, and `renderW` is the actual width that is rendered in the current frame.
+
+I've been using the `mix()` function from OPENRNDR to create a smooth transition between `prevW` and `goalW` across multiple frames. The `mix()` function is called in the `animW()` method within the `Cell` class. However, I suspect there's a problem in how I'm handling this transition which is causing the flashing issue.
+
+This is the code snippet that seems to be causing the flashing:
+
+```kotlin
+fun animW() {
+    renderW = mix(
+        prevW,
+        goalW,
+        1.0
+    )
+}
+```
+
+When I replace the third argument with 1.0, the flashing disappears, but the transitions also disappear. We discussed using a sine function to get a value between 0.0 and 1.0 for the third argument, which improved the situation, but there's still a stuttering issue. The next attempt was to add a flag, `transitionComplete`, to control when the transitions should start and stop.
+
+The current issue now is that the circles continue moving even after they reach the `goalW`. The desired behavior is for each circle to stop moving once it reaches its `goalW`, and only start moving again when a new goal width is set. Also, there is still a flashing issue to be resolved. The code for the entire program up to this point is provided above.
+
+Could you help me resolve these issues and make the width transitions for the circles behave as expected?
