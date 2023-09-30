@@ -41,14 +41,14 @@ fun main() = application {
     oliveProgram {
         GLOBAL.width = width
         GLOBAL.height = height
-        val imgCount = 467
+        val imgCount = 259
         GLOBAL.brightnessThreshold = 0.0
         GLOBAL.shapeScaler = 0.1
 
         var thisClock: Double
         // I think adjusting clockDiv adjusts the framerate
 //        val clockDiv = 0.25  // clockDiv of 0.05 means 20 frames between scenes I think
-        val clockDiv = 0.1888  // clockDiv of 0.05 means 20 frames between scenes I think
+        val clockDiv = 0.3888  // clockDiv of 0.05 means 20 frames between scenes I think
         val framesBtwnScenes = ((1.0 / clockDiv)) // this should mean how many frames between new scene
         // I think adjusting sceneInterval adjusts the sample rate
         GLOBAL.sceneInterval = 50  // this should mean how many intervals should pass between drawing a scene
@@ -56,10 +56,11 @@ fun main() = application {
 
         // "fire scene interval" when newSceneCounter >= sceneInterval
         val ratio = width.toDouble() / height.toDouble()
-        val imgs = mutableListOf<ColorBuffer>()
-        for(i in 1 until imgCount) {
-            imgs.add(loadImage("data/images/frames4/$i.png"))
-        }
+//        for(i in 1 until imgCount) {
+//            imgs.add(loadImage("data/images/sFrames/$i.png"))
+//        }
+        val imageFiles0 = File("data/images/sFrames").listFiles { _, name -> name.endsWith(".png") }?.sorted()
+        val imgs: List<ColorBuffer> = imageFiles0!!.map { loadImage(it) }
 
 //        val imageFiles = File("data/images/lidFrames").listFiles { _, name -> name.endsWith(".png") }?.sorted()
         val imageFiles = File("data/images/frames7").listFiles { _, name -> name.endsWith(".png") }?.sorted()
@@ -95,27 +96,28 @@ fun main() = application {
         }
 
 
-
         // Now you can use rotatedImg.shadow.read(...) instead of currentImg.shadow.read(...) in your loop
 
         extend {
+            thisClock = frameCount * clockDiv
             drawer.isolatedWithTarget(rotatedImg) {
 //                clear(ColorRGBa.BLACK)
 //                rotate(90.0)
 //                image(currentImg, 0.0, -height.toDouble(), width = height.toDouble(), height = width.toDouble())
+                currentImg = imgs[(thisClock).toInt() % imgs.size]
                 image(
                     currentImg,
                     0.0,
                     0.0,
 //                    -height.toDouble(),
-                    width = height.toDouble(),
-                    height = width.toDouble()
+                    width = width.toDouble(),
+                    height = height.toDouble()
                 )
             }
             rotatedImg.colorBuffer(0).shadow.download()
 
-            thisClock = frameCount * clockDiv
-            currentImg = imgs[(thisClock).toInt() % imgs.size]
+//            currentImg = imgs[(thisClock).toInt() % imgs.size]
+            currentImg = rotatedImg.colorBuffer(0)
             drawer.clear(ColorRGBa.BLACK)
 //            drawer.image(currentImg, 0.0, 0.0)
 
@@ -232,7 +234,9 @@ fun main() = application {
                 )
             }
 
+            // The problem is that rotatedImg needs to be used in place of currentImg in all instances.
 //            drawer.image(rotatedImg.colorBuffer(0), 0.0, 0.0)
+//            drawer.image(currentImg, 0.0, 0.0)
         }
     }
 }
