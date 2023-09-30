@@ -42,7 +42,7 @@ fun main() = application {
         GLOBAL.height = height
         val imgCount = 467
         GLOBAL.brightnessThreshold = 0.0
-        GLOBAL.shapeScaler = 1.0
+        GLOBAL.shapeScaler = 0.1
 
         var thisClock: Double
         // I think adjusting clockDiv adjusts the framerate
@@ -60,7 +60,8 @@ fun main() = application {
             imgs.add(loadImage("data/images/frames4/$i.png"))
         }
 
-        val imageFiles = File("data/images/lidFrames").listFiles { _, name -> name.endsWith(".png") }?.sorted()
+//        val imageFiles = File("data/images/lidFrames").listFiles { _, name -> name.endsWith(".png") }?.sorted()
+        val imageFiles = File("data/images/frames4").listFiles { _, name -> name.endsWith(".png") }?.sorted()
         val lidImgs: List<ColorBuffer> = imageFiles!!.map { loadImage(it) }
 
         val gridWidth = 20.0      // Number of grid units in width
