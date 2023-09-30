@@ -48,10 +48,10 @@ fun main() = application {
         var thisClock: Double
         // I think adjusting clockDiv adjusts the framerate
 //        val clockDiv = 0.25  // clockDiv of 0.05 means 20 frames between scenes I think
-        val clockDiv = 0.1  // clockDiv of 0.05 means 20 frames between scenes I think
+        val clockDiv = 0.1888  // clockDiv of 0.05 means 20 frames between scenes I think
         val framesBtwnScenes = ((1.0 / clockDiv)) // this should mean how many frames between new scene
         // I think adjusting sceneInterval adjusts the sample rate
-        GLOBAL.sceneInterval = 2  // this should mean how many intervals should pass between drawing a scene
+        GLOBAL.sceneInterval = 50  // this should mean how many intervals should pass between drawing a scene
         val framesBetweenSceneIntervals = framesBtwnScenes * sceneInterval
 
         // "fire scene interval" when newSceneCounter >= sceneInterval
@@ -141,15 +141,18 @@ fun main() = application {
                 cell.color = currentColor.toSRGB()
                 cell.position = Vector2((i * cellWidth), (j * cellHeight))
                 // +++
-//                cell.localPathslider = cell.localPathslider
+
+
+                // TRY COMMENTING ME BACK
                 cell.localPathslider = tweenWithOffset(
-                    t = (i * j).toDouble().map(
-                        0.0,
-                        indices.size.toDouble(),
-                        0.0,
-                        5.0
-                    ),
-                    offset = (( (i * j)+frameCount * 0.5) % 1.0)
+//                    t = (i * j).toDouble().map(
+//                        0.0,
+//                        indices.size.toDouble(),
+//                        0.0,
+//                        5.0
+//                    ),
+                    (( thisClock) % 1.0),
+                    offset = (( (i * j)+thisClock) % 1.0)
                 )
                 cell.brightness = mix(prevBrightness, brightness, (cell.localPathslider))
             }
