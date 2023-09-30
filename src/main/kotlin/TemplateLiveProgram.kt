@@ -13,6 +13,7 @@ import org.openrndr.extra.olive.oliveProgram
 import org.openrndr.math.IntVector2
 import org.openrndr.math.Vector2
 import org.openrndr.math.map
+import org.openrndr.math.mix
 import org.openrndr.shape.Circle
 import java.io.File
 
@@ -100,9 +101,12 @@ fun main() = application {
                 + 0.7152 * currentColor.g
                 + 0.0722 * currentColor.b
 
+                var tValue = mix(prevBrightness, brightness, (thisClock) % 1.0)
+
                 cell.id = idIncrementor++.toString()
                 prevBrightness = prevBrightness // Set previous brightness
-                cell.brightness = brightness
+                // cell.brightness = // brightness
+                cell.brightness = tValue
                 cell.color = currentColor.toSRGB()
                 cell.position = Vector2((i * cellWidth), (j * cellHeight))
             }
