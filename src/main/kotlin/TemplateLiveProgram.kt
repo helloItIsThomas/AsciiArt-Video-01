@@ -48,7 +48,7 @@ fun main() = application {
         var thisClock: Double
         // I think adjusting clockDiv adjusts the framerate
 //        val clockDiv = 0.25  // clockDiv of 0.05 means 20 frames between scenes I think
-        val clockDiv = 0.175  // clockDiv of 0.05 means 20 frames between scenes I think
+        val clockDiv = 0.1  // clockDiv of 0.05 means 20 frames between scenes I think
         val framesBtwnScenes = ((1.0 / clockDiv)) // this should mean how many frames between new scene
         // I think adjusting sceneInterval adjusts the sample rate
         GLOBAL.sceneInterval = 2  // this should mean how many intervals should pass between drawing a scene
@@ -90,8 +90,10 @@ fun main() = application {
 
         fun tweenWithOffset(t: Double, offset: Double): Double {
             val smoothT = t * t * (3 - 2 * t)
-            return smoothT + offset * (1 - smoothT)
+            val result = smoothT + offset * (1 - smoothT)
+            return result.coerceIn(0.0, 1.0)
         }
+
 
 
         // Now you can use rotatedImg.shadow.read(...) instead of currentImg.shadow.read(...) in your loop
@@ -130,26 +132,30 @@ fun main() = application {
                 + 0.7152 * currentColor.g
                 + 0.0722 * currentColor.b
 
-                var tValue = mix(prevBrightness, brightness, (thisClock) % 1.0)
+//                var tValue = mix(prevBrightness, brightness, (frameCount*0.05) % 1.0)
 
                 cell.id = idIncrementor++.toString()
-                prevBrightness = prevBrightness // Set previous brightness
                 // cell.brightness = // brightness
-                cell.brightness = tValue
+                prevBrightness = prevBrightness // Set previous brightness
+                cell.brightness = brightness
                 cell.color = currentColor.toSRGB()
                 cell.position = Vector2((i * cellWidth), (j * cellHeight))
                 // +++
 //                cell.localPathslider = cell.localPathslider
-                cell.localPathslider = tweenWithOffset((i*j).toDouble().map(
-                    0.0,
-                    indices.size.toDouble(),
-                    1.0,
-                    10.0
-
-                ), ((frameCount * 0.05) % 1.0))
+                cell.localPathslider = tweenWithOffset(
+                    t = (i * j).toDouble().map(
+                        0.0,
+                        indices.size.toDouble(),
+                        0.0,
+                        5.0
+                    ),
+                    offset = (( (i * j)+frameCount * 0.5) % 1.0)
+                )
+                cell.brightness = mix(prevBrightness, brightness, (cell.localPathslider))
             }
             testFlag.check(thisClock, sceneInterval)
 
+//            var tValue = mix(prevBrightness, brightness, (localPathslider) % 1.0)
 
             var circleList: MutableList<Circle> = mutableListOf()
             var circleListDark: MutableList<Circle> = mutableListOf()
