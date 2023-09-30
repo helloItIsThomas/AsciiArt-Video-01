@@ -47,10 +47,10 @@ fun main() = application {
         var thisClock: Double
         // I think adjusting clockDiv adjusts the framerate
 //        val clockDiv = 0.25  // clockDiv of 0.05 means 20 frames between scenes I think
-        val clockDiv = 0.333  // clockDiv of 0.05 means 20 frames between scenes I think
+        val clockDiv = 0.025  // clockDiv of 0.05 means 20 frames between scenes I think
         val framesBtwnScenes = ((1.0 / clockDiv)) // this should mean how many frames between new scene
         // I think adjusting sceneInterval adjusts the sample rate
-        GLOBAL.sceneInterval = 1  // this should mean how many intervals should pass between drawing a scene
+        GLOBAL.sceneInterval = 4  // this should mean how many intervals should pass between drawing a scene
         val framesBetweenSceneIntervals = framesBtwnScenes * sceneInterval
 
         // "fire scene interval" when newSceneCounter >= sceneInterval
@@ -118,14 +118,16 @@ fun main() = application {
 //                    )
 //                )
 
-                var localImgNum = GLOBAL.cellArray[i][j].brightness.map(
+//                println("TESTING")
+
+                var localImgNum = GLOBAL.cellArray[i][j].renderW + GLOBAL.cellArray[i][j].brightness.map(
                     0.0,
                     0.3,
                     0.0,
                     lidImgs.size.toDouble()
                 ).toInt()
                 imgList.add(
-                    lidImgs[localImgNum]
+                    lidImgs[localImgNum.toInt()]
                 )
 //                if(GLOBAL.cellArray[i][j].brightness > 0.185){
 //                    circleListLight.add(
@@ -152,6 +154,7 @@ fun main() = application {
 //            drawer.circles( circleListLight )
             drawer.circles( circleListDark )
             drawer.popTransforms()
+//            println(GLOBAL.cellArray.flatten()[i].renderW)
 
 
             imgList.forEachIndexed{ i, n ->
@@ -163,21 +166,6 @@ fun main() = application {
                     GLOBAL.cellHeight,
                 )
             }
-
-//            val increm = (frameCount*0.5).toInt()
-//                drawer.image(
-//                    lidImgs[increm % lidImgs.size],
-//                    0.0,
-//                    0.0,
-//                    drawer.bounds.height,
-//                    drawer.bounds.height
-//                )
-//            drawer.fill = null
-//            drawer.stroke = ColorRGBa.WHITE
-//            drawer.stroke = ColorRGBa.WHITE
-//            drawer.strokeWeight = 0.5
-//            drawer.rectangle(0.0, 0.0, width.toDouble(), height.toDouble())
-//            drawer.stroke = null
         }
     }
 }
