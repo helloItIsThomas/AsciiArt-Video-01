@@ -48,10 +48,10 @@ fun main() = application {
         var thisClock: Double
         // I think adjusting clockDiv adjusts the framerate
 //        val clockDiv = 0.25  // clockDiv of 0.05 means 20 frames between scenes I think
-        val clockDiv = 0.25  // clockDiv of 0.05 means 20 frames between scenes I think
+        val clockDiv = 0.175  // clockDiv of 0.05 means 20 frames between scenes I think
         val framesBtwnScenes = ((1.0 / clockDiv)) // this should mean how many frames between new scene
         // I think adjusting sceneInterval adjusts the sample rate
-        GLOBAL.sceneInterval = 17  // this should mean how many intervals should pass between drawing a scene
+        GLOBAL.sceneInterval = 2  // this should mean how many intervals should pass between drawing a scene
         val framesBetweenSceneIntervals = framesBtwnScenes * sceneInterval
 
         // "fire scene interval" when newSceneCounter >= sceneInterval
@@ -86,6 +86,11 @@ fun main() = application {
 
         val rotatedImg = renderTarget(width, height){
             colorBuffer()
+        }
+
+        fun tweenWithOffset(t: Double, offset: Double): Double {
+            val smoothT = t * t * (3 - 2 * t)
+            return smoothT + offset * (1 - smoothT)
         }
 
 
@@ -133,6 +138,15 @@ fun main() = application {
                 cell.brightness = tValue
                 cell.color = currentColor.toSRGB()
                 cell.position = Vector2((i * cellWidth), (j * cellHeight))
+                // +++
+//                cell.localPathslider = cell.localPathslider
+                cell.localPathslider = tweenWithOffset((i*j).toDouble().map(
+                    0.0,
+                    indices.size.toDouble(),
+                    1.0,
+                    10.0
+
+                ), ((frameCount * 0.05) % 1.0))
             }
             testFlag.check(thisClock, sceneInterval)
 
@@ -161,6 +175,7 @@ fun main() = application {
                     0.0,
                     lidImgs.size.toDouble()
                 ).toInt()
+
 
                 // This seems to be the list that is being
                 // updated

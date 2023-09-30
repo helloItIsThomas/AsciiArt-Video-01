@@ -24,6 +24,7 @@ class Cell(var brightness: Double = 0.0, var color: ColorRGBa = ColorRGBa.BLUE){
     var position: Vector2
     var radius: Double
     lateinit var id: String
+    var localPathslider: Double
     init {
         prevW = 0.0
         goalW = 0.0
@@ -33,6 +34,7 @@ class Cell(var brightness: Double = 0.0, var color: ColorRGBa = ColorRGBa.BLUE){
         renderColor = ColorRGBa.GREEN
         position = Vector2(width * 0.5, height * 0.5)
         radius = (renderW * shapeScaler) / 2.0
+        localPathslider = 0.0
     }
 
     fun updateBright(_newBright: Double) {
