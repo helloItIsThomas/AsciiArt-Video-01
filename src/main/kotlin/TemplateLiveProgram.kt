@@ -61,7 +61,7 @@ fun main() = application {
         }
 
 //        val imageFiles = File("data/images/lidFrames").listFiles { _, name -> name.endsWith(".png") }?.sorted()
-        val imageFiles = File("data/images/frames4").listFiles { _, name -> name.endsWith(".png") }?.sorted()
+        val imageFiles = File("data/images/frames7").listFiles { _, name -> name.endsWith(".png") }?.sorted()
         val lidImgs: List<ColorBuffer> = imageFiles!!.map { loadImage(it) }
 
         val gridWidth = 20.0      // Number of grid units in width
@@ -89,6 +89,9 @@ fun main() = application {
 
             var idIncrementor = 0
             indices.forEach { (i, j) ->
+                val cell = GLOBAL.cellArray[i][j]
+                var prevBrightness = cell.brightness // Store previous brightness
+
                 currentColor = currentImg.shadow.read(
                     i * cellWidth.toInt(), j * cellHeight.toInt()
                 )
@@ -97,10 +100,11 @@ fun main() = application {
                 + 0.7152 * currentColor.g
                 + 0.0722 * currentColor.b
 
-                GLOBAL.cellArray[i][j].id = idIncrementor++.toString() //   i can move this to the main block
-                GLOBAL.cellArray[i][j].brightness = brightness
-                GLOBAL.cellArray[i][j].color = currentColor.toSRGB()
-                GLOBAL.cellArray[i][j].position = Vector2((i * cellWidth), (j * cellHeight))
+                cell.id = idIncrementor++.toString()
+                prevBrightness = prevBrightness // Set previous brightness
+                cell.brightness = brightness
+                cell.color = currentColor.toSRGB()
+                cell.position = Vector2((i * cellWidth), (j * cellHeight))
             }
             testFlag.check(thisClock, sceneInterval)
 
@@ -119,14 +123,22 @@ fun main() = application {
 //                    )
 //                )
 
-//                println("TESTING")
 
-                var localImgNum = GLOBAL.cellArray[i][j].renderW + GLOBAL.cellArray[i][j].brightness.map(
+                // I need localImgNum to interpolate between this brightness and the previous brightness.
+
+                var localImgNum = GLOBAL.cellArray[i][j].brightness.map(
+//                var localImgNum = GLOBAL.cellArray.flatten()[i*j].brightness.map(
                     0.0,
                     0.3,
                     0.0,
                     lidImgs.size.toDouble()
                 ).toInt()
+
+                // This seems to be the list that is being
+                // updated
+                // and
+                // drawn
+                // every frame.
                 imgList.add(
                     lidImgs[localImgNum.toInt()]
                 )
