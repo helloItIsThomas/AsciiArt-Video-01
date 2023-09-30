@@ -13,6 +13,7 @@ import org.openrndr.extra.olive.oliveProgram
 import org.openrndr.math.IntVector2
 import org.openrndr.math.Vector2
 import org.openrndr.shape.Circle
+import java.io.File
 
 object GLOBAL {
     lateinit var cellArray: Array<Array<Cell>>
@@ -57,6 +58,10 @@ fun main() = application {
         for(i in 1 until imgCount) {
             imgs.add(loadImage("data/images/frames5/$i.png"))
         }
+
+        val imageFiles = File("data/images/lidFrames").listFiles { _, name -> name.endsWith(".png") }?.sorted()
+        val lidImgs: List<ColorBuffer> = imageFiles!!.map { loadImage(it) }
+
         val gridWidth = 60.0      // Number of grid units in width
         val gridHeight = (gridWidth / ratio)      // Number of grid units in height
 
@@ -96,6 +101,7 @@ fun main() = application {
                 GLOBAL.cellArray[i][j].position = Vector2((i * cellWidth), (j * cellHeight))
             }
             testFlag.check(thisClock, sceneInterval)
+
 
             var circleList: MutableList<Circle> = mutableListOf()
             var circleListDark: MutableList<Circle> = mutableListOf()
@@ -140,6 +146,16 @@ fun main() = application {
             drawer.strokeWeight = 0.5
             drawer.rectangle(0.0, 0.0, width.toDouble(), height.toDouble())
             drawer.stroke = null
+
+            val increm = (frameCount*0.5).toInt()
+                drawer.image(
+                    lidImgs[increm % lidImgs.size],
+                    0.0,
+                    0.0,
+                    drawer.bounds.height,
+                    drawer.bounds.height
+                )
+            println("testing")
         }
     }
 }
