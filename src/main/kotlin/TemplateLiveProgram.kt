@@ -6,8 +6,8 @@ import classes.Cell
 import classes.Flag
 import org.openrndr.application
 import org.openrndr.color.ColorRGBa
-import org.openrndr.draw.ColorBuffer
-import org.openrndr.draw.loadImage
+import org.openrndr.draw.*
+import org.openrndr.draw.colorBuffer
 import org.openrndr.extra.color.presets.LIGHT_GREEN
 import org.openrndr.extra.olive.oliveProgram
 import org.openrndr.math.IntVector2
@@ -30,8 +30,8 @@ object GLOBAL {
 
 fun main() = application {
     configure {
-        width = 426
-        height = 240
+        width = 540 // 1080
+        height = 960 // 1920
         hideWindowDecorations = true
         windowAlwaysOnTop = true
         windowTransparent = true
@@ -48,10 +48,10 @@ fun main() = application {
         var thisClock: Double
         // I think adjusting clockDiv adjusts the framerate
 //        val clockDiv = 0.25  // clockDiv of 0.05 means 20 frames between scenes I think
-        val clockDiv = 0.025  // clockDiv of 0.05 means 20 frames between scenes I think
+        val clockDiv = 0.25  // clockDiv of 0.05 means 20 frames between scenes I think
         val framesBtwnScenes = ((1.0 / clockDiv)) // this should mean how many frames between new scene
         // I think adjusting sceneInterval adjusts the sample rate
-        GLOBAL.sceneInterval = 4  // this should mean how many intervals should pass between drawing a scene
+        GLOBAL.sceneInterval = 17  // this should mean how many intervals should pass between drawing a scene
         val framesBetweenSceneIntervals = framesBtwnScenes * sceneInterval
 
         // "fire scene interval" when newSceneCounter >= sceneInterval
@@ -65,7 +65,7 @@ fun main() = application {
         val imageFiles = File("data/images/frames7").listFiles { _, name -> name.endsWith(".png") }?.sorted()
         val lidImgs: List<ColorBuffer> = imageFiles!!.map { loadImage(it) }
 
-        val gridWidth = 20.0      // Number of grid units in width
+        val gridWidth = 15.0      // Number of grid units in width
         val gridHeight = (gridWidth / ratio)      // Number of grid units in height
 
         GLOBAL.cellWidth = width / gridWidth
@@ -82,7 +82,31 @@ fun main() = application {
             (0 until gridHeight.toInt()).map { j -> Pair(i, j) }
         }
 
+        currentImg = imgs[0]
+
+        val rotatedImg = renderTarget(width, height){
+            colorBuffer()
+        }
+
+
+        // Now you can use rotatedImg.shadow.read(...) instead of currentImg.shadow.read(...) in your loop
+
         extend {
+            drawer.isolatedWithTarget(rotatedImg) {
+//                clear(ColorRGBa.BLACK)
+//                rotate(90.0)
+//                image(currentImg, 0.0, -height.toDouble(), width = height.toDouble(), height = width.toDouble())
+                image(
+                    currentImg,
+                    0.0,
+                    0.0,
+//                    -height.toDouble(),
+                    width = height.toDouble(),
+                    height = width.toDouble()
+                )
+            }
+            rotatedImg.colorBuffer(0).shadow.download()
+
             thisClock = frameCount * clockDiv
             currentImg = imgs[(thisClock).toInt() % imgs.size]
             drawer.clear(ColorRGBa.BLACK)
@@ -93,8 +117,8 @@ fun main() = application {
                 val cell = GLOBAL.cellArray[i][j]
                 var prevBrightness = cell.brightness // Store previous brightness
 
-                currentColor = currentImg.shadow.read(
-                    i * cellWidth.toInt(), j * cellHeight.toInt()
+                currentColor = rotatedImg.colorBuffer(0).shadow.read(
+                    (i * cellWidth.toInt())%currentImg.width, (j * cellHeight.toInt())%currentImg.height
                 )
                 val brightness =
                     0.2126 * currentColor.r
@@ -183,6 +207,8 @@ fun main() = application {
                     GLOBAL.cellHeight,
                 )
             }
+
+//            drawer.image(rotatedImg.colorBuffer(0), 0.0, 0.0)
         }
     }
 }
