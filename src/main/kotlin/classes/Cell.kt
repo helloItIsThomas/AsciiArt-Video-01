@@ -60,13 +60,13 @@ class Cell(var brightness: Double = 0.0, var color: ColorRGBa = ColorRGBa.BLUE){
     fun calcW() {
         prevCol = goalCol
         goalCol = color
-        prevW = goalW
-//                goalW = brightness.map(
-//                    0.0,
-//                    1.0,
-//                    0.0,
-//                    cellWidth.toDouble()
-//                )
+//        prevW = goalW
+                goalW = brightness.map(
+                    0.0,
+                    1.0,
+                    0.0,
+                    cellWidth.toDouble()
+                )
         if (prevBright.isNotEmpty()) {
             if(prevBright.last > brightnessThreshold){
                 goalW = prevBright.last.map(

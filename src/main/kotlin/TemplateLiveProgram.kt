@@ -12,6 +12,7 @@ import org.openrndr.extra.color.presets.LIGHT_GREEN
 import org.openrndr.extra.olive.oliveProgram
 import org.openrndr.math.IntVector2
 import org.openrndr.math.Vector2
+import org.openrndr.math.map
 import org.openrndr.shape.Circle
 import java.io.File
 
@@ -39,14 +40,14 @@ fun main() = application {
     oliveProgram {
         GLOBAL.width = width
         GLOBAL.height = height
-        val imgCount = 320
+        val imgCount = 467
         GLOBAL.brightnessThreshold = 0.0
         GLOBAL.shapeScaler = 1.0
 
         var thisClock: Double
         // I think adjusting clockDiv adjusts the framerate
 //        val clockDiv = 0.25  // clockDiv of 0.05 means 20 frames between scenes I think
-        val clockDiv = 0.25  // clockDiv of 0.05 means 20 frames between scenes I think
+        val clockDiv = 0.333  // clockDiv of 0.05 means 20 frames between scenes I think
         val framesBtwnScenes = ((1.0 / clockDiv)) // this should mean how many frames between new scene
         // I think adjusting sceneInterval adjusts the sample rate
         GLOBAL.sceneInterval = 1  // this should mean how many intervals should pass between drawing a scene
@@ -56,13 +57,13 @@ fun main() = application {
         val ratio = width.toDouble() / height.toDouble()
         val imgs = mutableListOf<ColorBuffer>()
         for(i in 1 until imgCount) {
-            imgs.add(loadImage("data/images/frames5/$i.png"))
+            imgs.add(loadImage("data/images/frames4/$i.png"))
         }
 
         val imageFiles = File("data/images/lidFrames").listFiles { _, name -> name.endsWith(".png") }?.sorted()
         val lidImgs: List<ColorBuffer> = imageFiles!!.map { loadImage(it) }
 
-        val gridWidth = 60.0      // Number of grid units in width
+        val gridWidth = 20.0      // Number of grid units in width
         val gridHeight = (gridWidth / ratio)      // Number of grid units in height
 
         GLOBAL.cellWidth = width / gridWidth
@@ -106,32 +107,43 @@ fun main() = application {
             var circleList: MutableList<Circle> = mutableListOf()
             var circleListDark: MutableList<Circle> = mutableListOf()
             var circleListLight: MutableList<Circle> = mutableListOf()
+            var imgList: MutableList<ColorBuffer> = mutableListOf()
 
             indices.forEach { (i, j) ->
-                circleList.add(
-                    Circle(
-                        GLOBAL.cellArray[i][j].position.x,
-                        GLOBAL.cellArray[i][j].position.y,
-                        GLOBAL.cellArray[i][j].renderW * shapeScaler
-                    )
+//                circleList.add(
+//                    Circle(
+//                        GLOBAL.cellArray[i][j].position.x,
+//                        GLOBAL.cellArray[i][j].position.y,
+//                        GLOBAL.cellArray[i][j].renderW * shapeScaler
+//                    )
+//                )
+
+                var localImgNum = GLOBAL.cellArray[i][j].brightness.map(
+                    0.0,
+                    0.3,
+                    0.0,
+                    lidImgs.size.toDouble()
+                ).toInt()
+                imgList.add(
+                    lidImgs[localImgNum]
                 )
-                if(GLOBAL.cellArray[i][j].brightness > 0.185){
-                    circleListLight.add(
-                        Circle(
-                            GLOBAL.cellArray[i][j].position.x,
-                            GLOBAL.cellArray[i][j].position.y,
-                            GLOBAL.cellArray[i][j].renderW * shapeScaler
-                        )
-                    )
-                } else {
-                    circleListDark.add(
-                        Circle(
-                            GLOBAL.cellArray[i][j].position.x,
-                            GLOBAL.cellArray[i][j].position.y,
-                            GLOBAL.cellArray[i][j].renderW * shapeScaler
-                        )
-                    )
-                }
+//                if(GLOBAL.cellArray[i][j].brightness > 0.185){
+//                    circleListLight.add(
+//                        Circle(
+//                            GLOBAL.cellArray[i][j].position.x,
+//                            GLOBAL.cellArray[i][j].position.y,
+//                            GLOBAL.cellArray[i][j].renderW * shapeScaler
+//                        )
+//                    )
+//                } else {
+//                    circleListDark.add(
+//                        Circle(
+//                            GLOBAL.cellArray[i][j].position.x,
+//                            GLOBAL.cellArray[i][j].position.y,
+//                            GLOBAL.cellArray[i][j].renderW * shapeScaler
+//                        )
+//                    )
+//                }
             }
 
             drawer.stroke = null
@@ -141,21 +153,31 @@ fun main() = application {
             drawer.circles( circleListDark )
             drawer.popTransforms()
 
-            drawer.fill = null
-            drawer.stroke = ColorRGBa.WHITE
-            drawer.strokeWeight = 0.5
-            drawer.rectangle(0.0, 0.0, width.toDouble(), height.toDouble())
-            drawer.stroke = null
 
-            val increm = (frameCount*0.5).toInt()
+            imgList.forEachIndexed{ i, n ->
                 drawer.image(
-                    lidImgs[increm % lidImgs.size],
-                    0.0,
-                    0.0,
-                    drawer.bounds.height,
-                    drawer.bounds.height
+                    n,
+                    GLOBAL.cellArray.flatten()[i].position.x,
+                    GLOBAL.cellArray.flatten()[i].position.y,
+                    GLOBAL.cellWidth,
+                    GLOBAL.cellHeight,
                 )
-            println("testing")
+            }
+
+//            val increm = (frameCount*0.5).toInt()
+//                drawer.image(
+//                    lidImgs[increm % lidImgs.size],
+//                    0.0,
+//                    0.0,
+//                    drawer.bounds.height,
+//                    drawer.bounds.height
+//                )
+//            drawer.fill = null
+//            drawer.stroke = ColorRGBa.WHITE
+//            drawer.stroke = ColorRGBa.WHITE
+//            drawer.strokeWeight = 0.5
+//            drawer.rectangle(0.0, 0.0, width.toDouble(), height.toDouble())
+//            drawer.stroke = null
         }
     }
 }
