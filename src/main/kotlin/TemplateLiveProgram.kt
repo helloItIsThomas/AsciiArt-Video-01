@@ -196,23 +196,6 @@ fun main() = application {
                 imgList.add(
                     lidImgs[localImgNum.toInt()]
                 )
-//                if(GLOBAL.cellArray[i][j].brightness > 0.185){
-//                    circleListLight.add(
-//                        Circle(
-//                            GLOBAL.cellArray[i][j].position.x,
-//                            GLOBAL.cellArray[i][j].position.y,
-//                            GLOBAL.cellArray[i][j].renderW * shapeScaler
-//                        )
-//                    )
-//                } else {
-//                    circleListDark.add(
-//                        Circle(
-//                            GLOBAL.cellArray[i][j].position.x,
-//                            GLOBAL.cellArray[i][j].position.y,
-//                            GLOBAL.cellArray[i][j].renderW * shapeScaler
-//                        )
-//                    )
-//                }
             }
 
             drawer.stroke = null
