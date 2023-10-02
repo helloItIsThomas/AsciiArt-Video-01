@@ -9,6 +9,7 @@ import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.*
 import org.openrndr.draw.colorBuffer
 import org.openrndr.extra.color.presets.LIGHT_GREEN
+import org.openrndr.extra.color.presets.PURPLE
 import org.openrndr.extra.olive.oliveProgram
 import org.openrndr.math.IntVector2
 import org.openrndr.math.Vector2
@@ -31,7 +32,7 @@ object GLOBAL {
 fun main() = application {
     configure {
         width = 540 // 1080
-        height = 960 // 1920
+        height = 540 // 1920
         hideWindowDecorations = true
         windowAlwaysOnTop = true
         windowTransparent = true
@@ -59,14 +60,14 @@ fun main() = application {
 //        for(i in 1 until imgCount) {
 //            imgs.add(loadImage("data/images/sFrames/$i.png"))
 //        }
-        val imageFiles0 = File("data/images/sFrames").listFiles { _, name -> name.endsWith(".png") }?.sorted()
+        val imageFiles0 = File("data/images/lidFrames").listFiles { _, name -> name.endsWith(".png") }?.sorted()
         val imgs: List<ColorBuffer> = imageFiles0!!.map { loadImage(it) }
 
 //        val imageFiles = File("data/images/lidFrames").listFiles { _, name -> name.endsWith(".png") }?.sorted()
-        val imageFiles = File("data/images/frames7").listFiles { _, name -> name.endsWith(".png") }?.sorted()
+        val imageFiles = File("data/images/sFrames").listFiles { _, name -> name.endsWith(".png") }?.sorted()
         val lidImgs: List<ColorBuffer> = imageFiles!!.map { loadImage(it) }
 
-        val gridWidth = 15.0      // Number of grid units in width
+        val gridWidth = 40.0      // Number of grid units in width
         val gridHeight = (gridWidth / ratio)      // Number of grid units in height
 
         GLOBAL.cellWidth = width / gridWidth
@@ -76,6 +77,7 @@ fun main() = application {
 
         var testFlag = Flag()
         var currentImg: ColorBuffer
+        var currentLetter: String
         var currentColor: ColorRGBa
         imgs.forEach{it.shadow.download()}
 
@@ -95,24 +97,42 @@ fun main() = application {
             return result.coerceIn(0.0, 1.0)
         }
 
+        var fontSize = 500.0
+
+        val myFont = loadFont("data/fonts/default.otf", fontSize)
+
+        var ascii = mutableListOf<String>(
+            "$", "@", "B", "%", "8", "&", "W", "M", "#", "*", "o", "a", "h", "k",
+            "b", "d", "p", "q", "w", "m", "Z", "O", "0", "Q", "L", "C", "J", "U",
+            "Y", "X", "z", "c", "v", "u", "n", "x", "r", "j", "f", "t", "/", "(",
+            ")", "1", "{", "}", "[", "]", "?", "-", "_", "+", "~", "<", ">", "i", "!",
+            "l", "I", ";", ":", ",", "\"", "^", "`", "'", "."
+        )
 
         // Now you can use rotatedImg.shadow.read(...) instead of currentImg.shadow.read(...) in your loop
 
         extend {
             thisClock = frameCount * clockDiv
             drawer.isolatedWithTarget(rotatedImg) {
-//                clear(ColorRGBa.BLACK)
+                clear(ColorRGBa.BLACK)
 //                rotate(90.0)
-//                image(currentImg, 0.0, -height.toDouble(), width = height.toDouble(), height = width.toDouble())
                 currentImg = imgs[(thisClock).toInt() % imgs.size]
+//                image(currentImg, 0.0, -height.toDouble(), width = height.toDouble(), height = width.toDouble())
                 image(
                     currentImg,
                     0.0,
                     0.0,
-//                    -height.toDouble(),
-                    width = width.toDouble(),
-                    height = height.toDouble()
+                    width = height.toDouble(),
+                    height = width.toDouble()
                 )
+//                image(
+//                    currentImg,
+//                    0.0,
+//                    0.0,
+//                    -height.toDouble(),
+//                    width = width.toDouble(),
+//                    height = height.toDouble()
+//                )
             }
             rotatedImg.colorBuffer(0).shadow.download()
 
@@ -166,6 +186,7 @@ fun main() = application {
             var circleListDark: MutableList<Circle> = mutableListOf()
             var circleListLight: MutableList<Circle> = mutableListOf()
             var imgList: MutableList<ColorBuffer> = mutableListOf()
+            var textList: MutableList<String> = mutableListOf()
 
             indices.forEach { (i, j) ->
 //                circleList.add(
@@ -194,32 +215,27 @@ fun main() = application {
                 // drawn
                 // every frame.
                 imgList.add(
-                    lidImgs[localImgNum.toInt()]
+                    lidImgs[ localImgNum.toInt() ]
+                )
+                textList.add(
+                    ascii[ localImgNum.toInt() % ascii.size]
                 )
             }
+
+//            drawer.pushTransforms()
+//            drawer.circles( circleListLight )
+//            drawer.circles( circleListDark )
+//            drawer.popTransforms()
 
             drawer.stroke = null
-            drawer.pushTransforms()
-            drawer.fill = ColorRGBa.LIGHT_GREEN
-//            drawer.circles( circleListLight )
-            drawer.circles( circleListDark )
-            drawer.popTransforms()
-//            println(GLOBAL.cellArray.flatten()[i].renderW)
-
-
-            imgList.forEachIndexed{ i, n ->
-                drawer.image(
+            textList.forEachIndexed { i, n ->
+                drawer.fill = GLOBAL.cellArray.flatten()[i].renderColor
+                drawer.text(
                     n,
                     GLOBAL.cellArray.flatten()[i].position.x,
-                    GLOBAL.cellArray.flatten()[i].position.y,
-                    GLOBAL.cellWidth,
-                    GLOBAL.cellHeight,
+                    GLOBAL.cellArray.flatten()[i].position.y
                 )
             }
-
-            // The problem is that rotatedImg needs to be used in place of currentImg in all instances.
-//            drawer.image(rotatedImg.colorBuffer(0), 0.0, 0.0)
-//            drawer.image(currentImg, 0.0, 0.0)
         }
     }
 }
