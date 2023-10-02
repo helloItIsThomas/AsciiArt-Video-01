@@ -197,7 +197,6 @@ fun main() = application {
 //                    )
 //                )
 
-
                 // I need localImgNum to interpolate between this brightness and the previous brightness.
 
                 var localImgNum = GLOBAL.cellArray[i][j].brightness.map(
